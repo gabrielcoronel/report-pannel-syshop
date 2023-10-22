@@ -1,0 +1,6 @@
+export default {
+  BACKGROUND_COLOR: "#0a0533",
+  ACCENT_COLOR_1: "#bd1994",
+  ACCENT_COLOR_2: "#cd63db",
+  SECONDARY_COLOR: "#0b1252"
+}

@@ -6,10 +6,19 @@ import {
   CardHeader,
   CardContent,
   CardActions,
+  Typography,
   IconButton,
   CircularProgress
 } from '@mui/material'
-import { DeleteIcon } from '@mui/icons-material'
+import { Delete } from '@mui/icons-material'
+import configuration from '../configuration'
+
+const styles = {
+  card: {
+    width: "80%",
+    backgroundColor: configuration.BACKGROUND_COLOR
+  }
+}
 
 const deleteReport = async (reportId) => {
   const payload = {
@@ -69,24 +78,31 @@ export default ({ report }) => {
   )
 
   return (
-    <Card sx={{ width: "80%" }}>
+    <Card raised sx={styles.card}>
       <CardHeader
+        titleTypographyProps={{ color: configuration.ACCENT_COLOR_1, fontSize: "2rem" }}
+        subheaderTypographyProps={{ color: "white", fontSize: "1.2rem" }}
         title={report.user_name}
         subheader={formatDate(report.created_datetime)}
       />
 
       <CardContent>
-        <Typography variant="body2" color="text.secondary">
+        <Typography
+          color="white"
+          sx={{ fontSize: "1rem" }}
+        >
           {report.content}
         </Typography>
       </CardContent>
 
-      <CardActions>
+      <CardActions
+        sx={{ justifyContent: "flex-end" }}
+      >
         <IconButton onClick={handleDeleteReport}>
           {
             deleteReportMutation.isLoading ?
-            <CircularProgress /> :
-            <DeleteIcon />
+            <CircularProgress color={configuration.ACCENT_COLOR_1} /> :
+            <Delete sx={{ color: configuration.ACCENT_COLOR_1 }} />
           }
         </IconButton>
       </CardActions>
