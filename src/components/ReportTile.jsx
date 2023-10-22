@@ -1,6 +1,8 @@
 import axios from 'axios'
+import { Fragment } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { formatApiUrl } from '../utilities'
+import { useSnackbar } from 'notistack'
 import {
   Card,
   CardHeader,
@@ -8,9 +10,9 @@ import {
   CardActions,
   Typography,
   IconButton,
-  CircularProgress
+  CircularProgress,
 } from '@mui/material'
-import { Delete } from '@mui/icons-material'
+import { Check, Close } from '@mui/icons-material'
 import configuration from '../configuration'
 
 const styles = {
@@ -50,6 +52,7 @@ const formatDate = (isoDateString) => {
 
 export default ({ report }) => {
   const queryClient = useQueryClient()
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar()
 
   const handleDeleteReport = () => {
     deleteReportMutation.mutate({
@@ -58,7 +61,20 @@ export default ({ report }) => {
   }
 
   const handleDeleteReportSuccess = () => {
-    console.log("éxito")
+    enqueueSnackbar(
+      "Reporte procesado exitosamente",
+      {
+        variant: "success",
+        autoHideDuration: 6000,
+        action: (snackbarId) => (
+          <IconButton
+            onClick={() => closeSnackbar(snackbarId)}
+          >
+            <Close />
+          </IconButton>
+        )
+      }
+    )
 
     queryClient.refetchQueries({
       queryKey: ["allReports"]
@@ -66,7 +82,20 @@ export default ({ report }) => {
   }
 
   const handleDeleteReportError = () => {
-    console.log("error")
+    enqueueSnackbar(
+      "No se pudo procesar el reporte, revisa tu conexión a Internet",
+      {
+        variant: "error",
+        autoHideDuration: 6000,
+        action: (snackbarId) => (
+          <IconButton
+            onClick={() => closeSnackbar(snackbarId)}
+          >
+            <Close />
+          </IconButton>
+        )
+      }
+    )
   }
 
   const deleteReportMutation = useMutation(
@@ -78,34 +107,36 @@ export default ({ report }) => {
   )
 
   return (
-    <Card raised sx={styles.card}>
-      <CardHeader
-        titleTypographyProps={{ color: configuration.ACCENT_COLOR_1, fontSize: "2rem" }}
-        subheaderTypographyProps={{ color: "white", fontSize: "1.2rem" }}
-        title={report.user_name}
-        subheader={formatDate(report.created_datetime)}
-      />
+    <Fragment>
+      <Card raised sx={styles.card}>
+        <CardHeader
+          titleTypographyProps={{ color: configuration.ACCENT_COLOR_1, fontSize: "2rem" }}
+          subheaderTypographyProps={{ color: "white", fontSize: "1.2rem" }}
+          title={report.user_name}
+          subheader={formatDate(report.created_datetime)}
+        />
 
-      <CardContent>
-        <Typography
-          color="white"
-          sx={{ fontSize: "1rem" }}
+        <CardContent>
+          <Typography
+            color="white"
+            sx={{ fontSize: "1rem" }}
+          >
+            {report.content}
+          </Typography>
+        </CardContent>
+
+        <CardActions
+          sx={{ justifyContent: "flex-end" }}
         >
-          {report.content}
-        </Typography>
-      </CardContent>
-
-      <CardActions
-        sx={{ justifyContent: "flex-end" }}
-      >
-        <IconButton onClick={handleDeleteReport}>
-          {
-            deleteReportMutation.isLoading ?
-            <CircularProgress color={configuration.ACCENT_COLOR_1} /> :
-            <Delete sx={{ color: configuration.ACCENT_COLOR_1 }} />
-          }
-        </IconButton>
-      </CardActions>
-    </Card>
+          <IconButton onClick={handleDeleteReport}>
+            {
+              deleteReportMutation.isLoading ?
+              <CircularProgress color="accent" /> :
+              <Check sx={{ color: configuration.ACCENT_COLOR_1 }} />
+            }
+          </IconButton>
+        </CardActions>
+      </Card>
+    </Fragment>
   )
 }
